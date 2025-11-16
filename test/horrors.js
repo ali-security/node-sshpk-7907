@@ -107,3 +107,27 @@ test('missing character in middle', function (t) {
 	});
 	t.end();
 });
+
+var KEY_NO_COMMENT = 'ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAA' +
+    'IbmlzdHAyNTYAAABBBK9+hFGVZ9RT61pg8t7EGgkvduhPr/CBYfx+5rQFEROj8EjkoGIH2xy' +
+    'pHOHBz0WikK5hYcwTM5YMvnNxuU0h4+c=';
+test('normal key, no comment', function (t) {
+	var k = sshpk.parseKey(KEY_NO_COMMENT, 'ssh');
+	t.strictEqual(k.type, 'ecdsa');
+	t.strictEqual(k.fingerprint('sha256').toString(),
+	    'SHA256:Kyu0EMqH8fzfp9RXKJ6kmsk9qKGBqVRtlOuk6bXfCEU');
+	t.strictEqual(k.comment, '(unnamed)');
+	t.end();
+});
+
+var KEY_COMMENT_EQ = 'ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAA' +
+    'IbmlzdHAyNTYAAABBBK9+hFGVZ9RT61pg8t7EGgkvduhPr/CBYfx+5rQFEROj8EjkoGIH2xy' +
+    'pHOHBz0WikK5hYcwTM5YMvnNxuU0h4+c= abc=def=a\n';
+test('comment contains =, trailing newline', function (t) {
+	var k = sshpk.parseKey(KEY_COMMENT_EQ, 'ssh');
+	t.strictEqual(k.type, 'ecdsa');
+	t.strictEqual(k.fingerprint('sha256').toString(),
+	    'SHA256:Kyu0EMqH8fzfp9RXKJ6kmsk9qKGBqVRtlOuk6bXfCEU');
+	t.strictEqual(k.comment, 'abc=def=a');
+	t.end();
+});
